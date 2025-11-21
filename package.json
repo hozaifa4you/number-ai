@@ -1,7 +1,19 @@
 {
 	"name": "number-ai",
 	"version": "0.0.1",
-	"description": "A simple package that helps you work with numbers by using AI.   You can use AI to discover patterns, do basic math, and make wise predictions.",
+	"description": "AI-powered number operations using OpenAI, Groq, and other LLM providers. Generate random numbers, discover patterns, and perform intelligent math operations.",
+	"keywords": [
+		"ai",
+		"openai",
+		"groq",
+		"llm",
+		"numbers",
+		"random",
+		"typescript",
+		"bun",
+		"gpt",
+		"math"
+	],
 	"homepage": "https://github.com/hozaifa4you/number-ai#readme",
 	"bugs": {
 		"url": "https://github.com/hozaifa4you/number-ai/issues"

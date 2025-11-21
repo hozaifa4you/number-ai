@@ -1,0 +1,37 @@
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Source files (only dist/ is needed)
+src/
+test/
+
+# Development files
+.github/
+.git/
+.gitignore
+.gitattributes
+.editorconfig
+
+# Config files
+tsconfig.json
+biome.json
+bunfig.toml
+bun.lock
+
+# Dependencies
+node_modules/
+
+# Build
+*.tgz
+
+# Contributing
+CONTRIBUTING.md
