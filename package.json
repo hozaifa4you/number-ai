@@ -56,5 +56,10 @@
 	"simple-git-hooks": {
 		"pre-commit": "bun run lint && bun run type-check"
 	},
-	"types": "./dist/index.d.ts"
+	"types": "./dist/index.d.ts",
+	"dependencies": {
+		"dotenv": "^17.2.3",
+		"groq-sdk": "^0.36.0",
+		"openai": "^6.9.1"
+	}
 }
