@@ -2,8 +2,9 @@ root = true
 
 [*]
 indent_style = tab
-end_of_line = lf
+end_of_line = unset
 insert_final_newline = true
 trim_trailing_whitespace = true
 charset = utf-8
-quote_type = single
+quote_type = double
+tab_width = 3
