@@ -7,14 +7,15 @@ dotenv.config()
 
 const apiKey = process.env.OPENAI_API_KEY
 
-class NumberAiWithOpenAi extends OpenAI {
+class NumberAiWithOpenAi {
+	private client: OpenAI
 	private model: ChatCompletionCreateParamsBase['model']
 
 	constructor(
 		userApiKey?: string,
 		model?: ChatCompletionCreateParamsBase['model'],
 	) {
-		super({ apiKey: userApiKey ?? apiKey })
+		this.client = new OpenAI({ apiKey: userApiKey ?? apiKey })
 
 		this.model = model ?? 'gpt-4o-mini'
 	}
@@ -23,7 +24,7 @@ class NumberAiWithOpenAi extends OpenAI {
 		min?: number,
 		max?: number,
 	): Promise<RandomIntResponse> {
-		const response = await this.chat.completions.create({
+		const response = await this.client.chat.completions.create({
 			model: this.model,
 			messages: [
 				{
@@ -56,6 +57,11 @@ class NumberAiWithOpenAi extends OpenAI {
 				error: 'No response from AI. Maybe some error occurred.',
 			}
 		}
+	}
+
+	// Expose the internal client for advanced use in a controlled way (testing/debugging).
+	public get _internalClient(): OpenAI {
+		return this.client
 	}
 }
 

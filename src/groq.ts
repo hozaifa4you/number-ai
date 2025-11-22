@@ -7,11 +7,16 @@ dotenv.config()
 
 const apiKey = process.env.GROQ_API_KEY
 
-class NumberAiWithGroq extends Groq {
+/**
+ * Use composition (wrap the Groq client) instead of extending it.
+ * This prevents exposing all Groq methods on the public instance.
+ */
+class NumberAiWithGroq {
+	private client: Groq
 	private model: ChatCompletionCreateParamsBase['model']
 
 	constructor(userApiKey?: string, model?: string) {
-		super({ apiKey: userApiKey ?? apiKey })
+		this.client = new Groq({ apiKey: userApiKey ?? apiKey })
 		this.model = model ?? 'openai/gpt-oss-20b'
 	}
 
@@ -19,7 +24,7 @@ class NumberAiWithGroq extends Groq {
 		min?: number,
 		max?: number,
 	): Promise<RandomIntResponse> {
-		const response = await this.chat.completions.create({
+		const response = await this.client.chat.completions.create({
 			model: this.model,
 			messages: [
 				{
@@ -52,6 +57,12 @@ class NumberAiWithGroq extends Groq {
 				error: 'No response from AI. Maybe some error occurred.',
 			}
 		}
+	}
+
+	// Provide a way to access the underlying client for advanced scenarios
+	// but keep it intentionally non-enumerable to avoid accidental usage.
+	public get _internalClient(): Groq {
+		return this.client
 	}
 }
 
