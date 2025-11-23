@@ -15,8 +15,12 @@ class NumberAiWithOpenAi {
 		userApiKey?: string,
 		model?: ChatCompletionCreateParamsBase['model'],
 	) {
-		this.client = new OpenAI({ apiKey: userApiKey ?? apiKey })
+		const key = userApiKey ?? apiKey
+		if (!key) {
+			throw new Error('API key is required for OpenAI client initialization.')
+		}
 
+		this.client = new OpenAI({ apiKey: key })
 		this.model = model ?? 'gpt-4o-mini'
 	}
 

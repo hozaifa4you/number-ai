@@ -16,7 +16,12 @@ class NumberAiWithGroq {
 	private model: ChatCompletionCreateParamsBase['model']
 
 	constructor(userApiKey?: string, model?: string) {
-		this.client = new Groq({ apiKey: userApiKey ?? apiKey })
+		const key = userApiKey ?? apiKey
+		if (!key) {
+			throw new Error('API key is required for Groq client initialization.')
+		}
+
+		this.client = new Groq({ apiKey: key })
 		this.model = model ?? 'openai/gpt-oss-20b'
 	}
 
