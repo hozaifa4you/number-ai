@@ -1,6 +1,6 @@
 {
 	"name": "number-ai",
-	"version": "0.1.2",
+	"version": "0.1.3",
 	"description": "AI-powered number operations using OpenAI, Groq, and other LLM providers. Generate random numbers, discover patterns, and perform intelligent math operations.",
 	"keywords": [
 		"ai",
