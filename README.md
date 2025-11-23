@@ -94,6 +94,45 @@ if (result.error) {
 }
 ```
 
+### `randomFloat(min?, max?)`
+
+Generate a random float using AI.
+
+**Parameters:**
+
+-  `min` (optional) - Minimum value (inclusive)
+-  `max` (optional) - Maximum value (inclusive)
+
+**Returns:** `Promise<{ num: number | null, error: string | null }>`
+
+**Examples:**
+
+```typescript
+// Between 1 and 100
+await ai.randomFloat(1, 100);
+// { num: 42.50, error: null }
+
+// Greater than or equal to 50
+await ai.randomFloat(50);
+// { num: 73.92, error: null }
+
+// Less than or equal to 20
+await ai.randomFloat(undefined, 20);
+// { num: 15.64, error: null }
+
+// Any random integer
+await ai.randomFloat();
+// { num: -127.65, error: null }
+
+// Error handling
+const result = await ai.randomFloat(1, 10);
+if (result.error) {
+	console.error("Error:", result.error);
+} else {
+	console.log("Number:", result.num);
+}
+```
+
 ## TypeScript
 
 Full TypeScript support included:
