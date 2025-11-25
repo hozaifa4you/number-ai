@@ -12,12 +12,12 @@ type InternalClientForTest = {
 
 describe('NumberAiWithOpenAi', () => {
 	it('should initialize with default model', () => {
-		const client = new NumberAiWithOpenAi('test-key')
+		const client = new NumberAiWithOpenAi({ apiKey: 'test-key' })
 		expect(client).toBeDefined()
 	})
 
 	it('should return random integer with valid response', async () => {
-		const client = new NumberAiWithOpenAi('test-key')
+		const client = new NumberAiWithOpenAi({ apiKey: 'test-key' })
 
 		// Mock the internal chat.completions.create method on the wrapped client
 		const internal = (
@@ -41,7 +41,7 @@ describe('NumberAiWithOpenAi', () => {
 	})
 
 	it('should handle missing response', async () => {
-		const client = new NumberAiWithOpenAi('test-key')
+		const client = new NumberAiWithOpenAi({ apiKey: 'test-key' })
 
 		const internal = (
 			client as unknown as { _internalClient: InternalClientForTest }
@@ -58,7 +58,7 @@ describe('NumberAiWithOpenAi', () => {
 	})
 
 	it('should handle invalid JSON', async () => {
-		const client = new NumberAiWithOpenAi('test-key')
+		const client = new NumberAiWithOpenAi({ apiKey: 'test-key' })
 
 		const internal = (
 			client as unknown as { _internalClient: InternalClientForTest }
