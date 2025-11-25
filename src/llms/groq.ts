@@ -4,6 +4,7 @@ import type { ChatCompletionCreateParamsBase } from 'groq-sdk/resources/chat/com
 import { SystemPrompts } from '../common/system'
 import type {
 	LLMOptions,
+	RandomFloatArrayResponse,
 	RandomFloatResponse,
 	RandomIntArrayResponse,
 	RandomIntResponse,
@@ -161,6 +162,57 @@ class NumberAiWithGroq {
 
 			const parsed = JSON.parse(messageContent)
 			return { nums: parsed?.random_int_array ?? parsed }
+		} catch (error) {
+			return {
+				error: (error as Error).message ?? ' An unknown error occurred.',
+			}
+		}
+	}
+
+	/**
+	 * Generate an array of random floats using the Groq model.
+	 * Must provide count parameter. Min and max are optional.
+	 *
+	 * @param count - Required array length
+	 * @param min - Optional min (inclusive)
+	 * @param max - Optional max (inclusive)
+	 * @returns Promise resolving to RandomIntArrayResponse containing the array or an error message.
+	 */
+	public async randomFloatArray(
+		count: number,
+		min?: number,
+		max?: number,
+	): Promise<RandomFloatArrayResponse> {
+		if (!count) {
+			return { error: 'Count parameter is required.' }
+		}
+
+		try {
+			const response = await this.client.chat.completions.create({
+				model: this.model,
+				response_format: { type: 'json_object' },
+				messages: [
+					SystemPrompts.RANDOM_INT_ARRAY,
+					{
+						role: 'user',
+						content: `
+							COUNT: ${count},
+							MIN: ${min ?? 'not provided'},
+							MAX: ${max ?? 'not provided'}.
+							Please provide an array of random floats based on the given constraints.
+						`,
+					},
+				],
+			})
+			const messageContent = response.choices?.[0]?.message?.content
+			if (!messageContent) {
+				return {
+					error: 'No response from AI. Maybe some error occurred.',
+				}
+			}
+
+			const parsed = JSON.parse(messageContent)
+			return { nums: parsed?.random_float_array ?? parsed }
 		} catch (error) {
 			return {
 				error: (error as Error).message ?? ' An unknown error occurred.',
