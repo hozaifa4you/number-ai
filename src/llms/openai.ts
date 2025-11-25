@@ -2,7 +2,11 @@ import dotenv from 'dotenv'
 import OpenAI from 'openai'
 import type { ChatCompletionCreateParamsBase } from 'openai/resources/chat/completions.mjs'
 import { SystemPrompts } from '../common/system'
-import type { RandomIntResponse } from '../types/common'
+import type {
+	LLMOptions,
+	RandomFloatResponse,
+	RandomIntResponse,
+} from '../types/common'
 
 dotenv.config()
 
@@ -12,17 +16,14 @@ class NumberAiWithOpenAi {
 	private client: OpenAI
 	private model: ChatCompletionCreateParamsBase['model']
 
-	constructor(
-		userApiKey?: string,
-		model?: ChatCompletionCreateParamsBase['model'],
-	) {
-		const key = userApiKey ?? apiKey
+	constructor(options: LLMOptions) {
+		const key = options.apiKey ?? apiKey
 		if (!key) {
 			throw new Error('API key is required for OpenAI client initialization.')
 		}
 
 		this.client = new OpenAI({ apiKey: key })
-		this.model = model ?? 'gpt-4o-mini'
+		this.model = options.model ?? 'gpt-4o-mini'
 	}
 
 	/**
@@ -80,7 +81,7 @@ class NumberAiWithOpenAi {
 	public async randomFloat(
 		min?: number,
 		max?: number,
-	): Promise<RandomIntResponse> {
+	): Promise<RandomFloatResponse> {
 		const response = await this.client.chat.completions.create({
 			model: this.model,
 			messages: [

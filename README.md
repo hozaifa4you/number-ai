@@ -18,7 +18,7 @@ npm install number-ai
 ```typescript
 import { NumberAiWithOpenAi } from "number-ai";
 
-const ai = new NumberAiWithOpenAi("your-openai-api-key");
+const ai = new NumberAiWithOpenAi();
 
 // Generate random integer
 const result = await ai.randomInt(1, 100);
@@ -30,7 +30,7 @@ console.log(result); // { num: 42, error: null }
 ```typescript
 import { NumberAiWithGroq } from "number-ai";
 
-const ai = new NumberAiWithGroq("your-groq-api-key");
+const ai = new NumberAiWithGroq();
 
 const result = await ai.randomInt(1, 100);
 console.log(result); // { num: 87, error: null }
@@ -43,17 +43,23 @@ console.log(result); // { num: 87, error: null }
 const ai = new NumberAiWithOpenAi(); // uses process.env.OPENAI_API_KEY
 ```
 
-### Custom Model
+### Custom Model & pass api key
 
 ```typescript
 // OpenAI with custom model
-const ai = new NumberAiWithOpenAi("api-key", "gpt-4");
+const ai = new NumberAiWithOpenAi({
+	apiKey: "<your api key>",
+	model: "<model>", // default: gpt-4o-mini
+});
 
 // Groq with custom model
-const ai = new NumberAiWithGroq("api-key", "llama-3.1-70b-versatile");
+const ai = new NumberAiWithGroq({
+	apiKey: "<your api key>",
+	model: "<model>", // default: openai/gpt-oss-20b
+});
 ```
 
-## API
+## APIs
 
 ### `randomInt(min?, max?)`
 

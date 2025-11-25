@@ -2,7 +2,11 @@ import dotenv from 'dotenv'
 import Groq from 'groq-sdk'
 import type { ChatCompletionCreateParamsBase } from 'groq-sdk/resources/chat/completions.mjs'
 import { SystemPrompts } from '../common/system'
-import type { RandomIntResponse } from '../types/common'
+import type {
+	LLMOptions,
+	RandomFloatResponse,
+	RandomIntResponse,
+} from '../types/common'
 
 dotenv.config()
 
@@ -12,14 +16,14 @@ class NumberAiWithGroq {
 	private client: Groq
 	private model: ChatCompletionCreateParamsBase['model']
 
-	constructor(userApiKey?: string, model?: string) {
-		const key = userApiKey ?? apiKey
+	constructor(options: LLMOptions) {
+		const key = options.apiKey ?? apiKey
 		if (!key) {
 			throw new Error('API key is required for Groq client initialization.')
 		}
 
 		this.client = new Groq({ apiKey: key })
-		this.model = model ?? 'openai/gpt-oss-20b'
+		this.model = options.model ?? 'openai/gpt-oss-20b'
 	}
 
 	public async randomInt(
@@ -61,7 +65,7 @@ class NumberAiWithGroq {
 	public async randomFloat(
 		min?: number,
 		max?: number,
-	): Promise<RandomIntResponse> {
+	): Promise<RandomFloatResponse> {
 		const response = await this.client.chat.completions.create({
 			model: this.model,
 			messages: [
