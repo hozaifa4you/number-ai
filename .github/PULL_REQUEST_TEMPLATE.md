@@ -6,14 +6,14 @@
 
 <!-- Check the relevant option -->
 
--  [ ] 🐛 Bug fix
--  [ ] ✨ New feature
--  [ ] 💥 Breaking change
--  [ ] 📝 Documentation
--  [ ] ♻️ Refactoring
--  [ ] ⚡ Performance
--  [ ] ✅ Tests
--  [ ] 🔧 Build/CI
+- [ ] 🐛 Bug fix
+- [ ] ✨ New feature
+- [ ] 💥 Breaking change
+- [ ] 📝 Documentation
+- [ ] ♻️ Refactoring
+- [ ] ⚡ Performance
+- [ ] ✅ Tests
+- [ ] 🔧 Build/CI
 
 ## Related Issues
 
@@ -30,15 +30,15 @@
 
 <!-- How did you test this? -->
 
--  [ ] Tests added/updated
--  [ ] All tests passing
+- [ ] Tests added/updated
+- [ ] All tests passing
 
 ## Checklist
 
--  [ ] Code follows project style
--  [ ] Self-reviewed
--  [ ] Documentation updated (if needed)
--  [ ] No breaking changes (or documented)
+- [ ] Code follows project style
+- [ ] Self-reviewed
+- [ ] Documentation updated (if needed)
+- [ ] No breaking changes (or documented)
 
 ## Screenshots/Notes
 

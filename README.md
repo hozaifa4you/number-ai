@@ -16,31 +16,31 @@ npm install number-ai
 ### OpenAI
 
 ```typescript
-import { NumberAiWithOpenAi } from "number-ai";
+import { NumberAiWithOpenAi } from 'number-ai'
 
-const ai = new NumberAiWithOpenAi();
+const ai = new NumberAiWithOpenAi()
 
 // Generate random integer
-const result = await ai.randomInt(1, 100);
-console.log(result); // { num: 42, error: null }
+const result = await ai.randomInt(1, 100)
+console.log(result) // { num: 42, error: null }
 ```
 
 ### Groq
 
 ```typescript
-import { NumberAiWithGroq } from "number-ai";
+import { NumberAiWithGroq } from 'number-ai'
 
-const ai = new NumberAiWithGroq();
+const ai = new NumberAiWithGroq()
 
-const result = await ai.randomInt(1, 100);
-console.log(result); // { num: 87, error: null }
+const result = await ai.randomInt(1, 100)
+console.log(result) // { num: 87, error: null }
 ```
 
 ### With Environment Variables
 
 ```typescript
 // Set OPENAI_API_KEY or GROQ_API_KEY in .env
-const ai = new NumberAiWithOpenAi(); // uses process.env.OPENAI_API_KEY
+const ai = new NumberAiWithOpenAi() // uses process.env.OPENAI_API_KEY
 ```
 
 ### Custom Model & pass api key
@@ -48,15 +48,15 @@ const ai = new NumberAiWithOpenAi(); // uses process.env.OPENAI_API_KEY
 ```typescript
 // OpenAI with custom model
 const ai = new NumberAiWithOpenAi({
-	apiKey: "<your api key>",
-	model: "<model>", // default: gpt-4o-mini
-});
+	apiKey: '<your api key>',
+	model: '<model>', // default: gpt-4o-mini
+})
 
 // Groq with custom model
 const ai = new NumberAiWithGroq({
-	apiKey: "<your api key>",
-	model: "<model>", // default: openai/gpt-oss-20b
-});
+	apiKey: '<your api key>',
+	model: '<model>', // default: openai/gpt-oss-20b
+})
 ```
 
 ## APIs
@@ -67,8 +67,8 @@ Generate a random integer using AI.
 
 **Parameters:**
 
--  `min` (optional) - Minimum value (inclusive)
--  `max` (optional) - Maximum value (inclusive)
+- `min` (optional) - Minimum value (inclusive)
+- `max` (optional) - Maximum value (inclusive)
 
 **Returns:** `Promise<{ num: number | null, error: string | null }>`
 
@@ -76,27 +76,27 @@ Generate a random integer using AI.
 
 ```typescript
 // Between 1 and 100
-await ai.randomInt(1, 100);
+await ai.randomInt(1, 100)
 // { num: 42, error: null }
 
 // Greater than or equal to 50
-await ai.randomInt(50);
+await ai.randomInt(50)
 // { num: 73, error: null }
 
 // Less than or equal to 20
-await ai.randomInt(undefined, 20);
+await ai.randomInt(undefined, 20)
 // { num: 15, error: null }
 
 // Any random integer
-await ai.randomInt();
+await ai.randomInt()
 // { num: -127, error: null }
 
 // Error handling
-const result = await ai.randomInt(1, 10);
+const result = await ai.randomInt(1, 10)
 if (result.error) {
-	console.error("Error:", result.error);
+	console.error('Error:', result.error)
 } else {
-	console.log("Number:", result.num);
+	console.log('Number:', result.num)
 }
 ```
 
@@ -106,8 +106,8 @@ Generate a random float using AI.
 
 **Parameters:**
 
--  `min` (optional) - Minimum value (inclusive)
--  `max` (optional) - Maximum value (inclusive)
+- `min` (optional) - Minimum value (inclusive)
+- `max` (optional) - Maximum value (inclusive)
 
 **Returns:** `Promise<{ num: number | null, error: string | null }>`
 
@@ -115,27 +115,27 @@ Generate a random float using AI.
 
 ```typescript
 // Between 1 and 100
-await ai.randomFloat(1, 100);
+await ai.randomFloat(1, 100)
 // { num: 42.50, error: null }
 
 // Greater than or equal to 50
-await ai.randomFloat(50);
+await ai.randomFloat(50)
 // { num: 73.92, error: null }
 
 // Less than or equal to 20
-await ai.randomFloat(undefined, 20);
+await ai.randomFloat(undefined, 20)
 // { num: 15.64, error: null }
 
 // Any random integer
-await ai.randomFloat();
+await ai.randomFloat()
 // { num: -127.65, error: null }
 
 // Error handling
-const result = await ai.randomFloat(1, 10);
+const result = await ai.randomFloat(1, 10)
 if (result.error) {
-	console.error("Error:", result.error);
+	console.error('Error:', result.error)
 } else {
-	console.log("Number:", result.num);
+	console.log('Number:', result.num)
 }
 ```
 
@@ -144,9 +144,9 @@ if (result.error) {
 Full TypeScript support included:
 
 ```typescript
-import type { RandomIntResponse } from "number-ai";
+import type { RandomIntResponse } from 'number-ai'
 
-const result: RandomIntResponse = await ai.randomInt(1, 100);
+const result: RandomIntResponse = await ai.randomInt(1, 100)
 ```
 
 ## License

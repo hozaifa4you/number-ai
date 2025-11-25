@@ -14,3 +14,5 @@ export interface RandomIntArrayResponse {
 	nums?: number[]
 	error?: string
 }
+
+export type RandomFloatArrayResponse = RandomIntArrayResponse
