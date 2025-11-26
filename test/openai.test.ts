@@ -37,7 +37,7 @@ describe('NumberAiWithOpenAi', () => {
 
 		const result = await client.randomInt(1, 100)
 		expect(result.num).toBe(42)
-		expect(result.error).toBeNull()
+		expect(result.error).toBeUndefined()
 	})
 
 	it('should handle missing response', async () => {
@@ -53,7 +53,7 @@ describe('NumberAiWithOpenAi', () => {
 		)
 
 		const result = await client.randomInt()
-		expect(result.num).toBeNull()
+		expect(result.num).toBeUndefined()
 		expect(result.error).toBe('No response from AI. Maybe some error occurred.')
 	})
 
@@ -76,7 +76,7 @@ describe('NumberAiWithOpenAi', () => {
 		)
 
 		const result = await client.randomInt()
-		expect(result.num).toBeNull()
+		expect(result.num).toBeUndefined()
 		expect(result.error).toBe('No response from AI. Maybe some error occurred.')
 	})
 })

@@ -3,6 +3,7 @@ import Groq from 'groq-sdk'
 import type { ChatCompletionCreateParamsBase } from 'groq-sdk/resources/chat/completions.mjs'
 import { SystemPrompts } from '../common/system'
 import type {
+	IsPrimeResponse,
 	LLMOptions,
 	RandomFloatArrayResponse,
 	RandomFloatResponse,
@@ -57,17 +58,15 @@ class NumberAiWithGroq {
 		const messageContent = response.choices?.[0]?.message?.content
 		if (!messageContent) {
 			return {
-				num: null,
 				error: 'No response from AI. Maybe some error occurred.',
 			}
 		}
 
 		try {
 			const parsed = JSON.parse(messageContent)
-			return { num: parsed?.random_integer ?? parsed, error: null }
+			return { num: parsed?.random_integer ?? parsed }
 		} catch (_e) {
 			return {
-				num: null,
 				error: 'No response from AI. Maybe some error occurred.',
 			}
 		}
@@ -102,17 +101,15 @@ class NumberAiWithGroq {
 		const messageContent = response.choices?.[0]?.message?.content
 		if (!messageContent) {
 			return {
-				num: null,
 				error: 'No response from AI. Maybe some error occurred.',
 			}
 		}
 
 		try {
 			const parsed = JSON.parse(messageContent)
-			return { num: parsed?.random_float ?? parsed, error: null }
+			return { num: parsed?.random_float ?? parsed }
 		} catch (_e) {
 			return {
-				num: null,
 				error: 'No response from AI. Maybe some error occurred.',
 			}
 		}
@@ -192,7 +189,7 @@ class NumberAiWithGroq {
 				model: this.model,
 				response_format: { type: 'json_object' },
 				messages: [
-					SystemPrompts.RANDOM_INT_ARRAY,
+					SystemPrompts.RANDOM_FLOAT_ARRAY,
 					{
 						role: 'user',
 						content: `
@@ -213,6 +210,41 @@ class NumberAiWithGroq {
 
 			const parsed = JSON.parse(messageContent)
 			return { nums: parsed?.random_float_array ?? parsed }
+		} catch (error) {
+			return {
+				error: (error as Error).message ?? ' An unknown error occurred.',
+			}
+		}
+	}
+
+	/**
+	 * @description Check if a number is prime using the Groq model.
+	 * @param n Required - number to check for primality
+	 * @returns Promise resolving to IsPrimeResponse containing the result or an error message.
+	 */
+	public async isPrime(n: number): Promise<IsPrimeResponse> {
+		try {
+			const response = await this.client.chat.completions.create({
+				model: this.model,
+				response_format: { type: 'json_object' },
+				messages: [
+					SystemPrompts.IS_PRIME,
+					{
+						role: 'user',
+						content: `NUMBER: ${n}`,
+					},
+				],
+			})
+
+			const messageContent = response.choices?.[0]?.message?.content
+			if (!messageContent) {
+				return {
+					error: 'No response from AI. Maybe some error occurred.',
+				}
+			}
+
+			const parsed = JSON.parse(messageContent)
+			return { is_prime: parsed?.is_prime ?? parsed }
 		} catch (error) {
 			return {
 				error: (error as Error).message ?? ' An unknown error occurred.',

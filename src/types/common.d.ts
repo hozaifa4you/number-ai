@@ -4,8 +4,8 @@ export interface LLMOptions {
 }
 
 export interface RandomIntResponse {
-	num: number | null
-	error: string | null
+	num?: number
+	error?: string
 }
 
 export type RandomFloatResponse = RandomIntResponse
@@ -16,3 +16,8 @@ export interface RandomIntArrayResponse {
 }
 
 export type RandomFloatArrayResponse = RandomIntArrayResponse
+
+export interface IsPrimeResponse {
+	is_prime?: boolean
+	error?: string
+}

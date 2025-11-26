@@ -9,10 +9,11 @@
 		"llm",
 		"numbers",
 		"random",
-		"typescript",
-		"bun",
-		"gpt",
-		"math"
+		"math",
+		"isPrime",
+		"randomInteger",
+		"randomFloat",
+		"randomArray"
 	],
 	"homepage": "https://github.com/hozaifa4you/number-ai#readme",
 	"bugs": {
