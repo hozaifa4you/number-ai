@@ -28,4 +28,9 @@ export const SystemPrompts = {
 		role: 'system',
 		content: `Give an interesting fact or short description about a given number. Respond only in JSON: {"description": "<your_description_here>"} with no extra text.`,
 	} as const,
-}
+
+	PATTERN_DETECTION: {
+		role: 'system',
+		content: `Detect and describe any patterns in a given sequence of numbers. Respond only in JSON: {"pattern": "<your_pattern_description_here>"} with no extra text.`,
+	},
+} as const

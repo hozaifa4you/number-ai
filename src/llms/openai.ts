@@ -6,6 +6,7 @@ import type {
 	DescribeNumberResponse,
 	IsPrimeResponse,
 	LLMOptions,
+	PatternDetectionResponse,
 	RandomFloatArrayResponse,
 	RandomFloatResponse,
 	RandomIntArrayResponse,
@@ -277,6 +278,41 @@ class NumberAiWithOpenAi {
 
 			const parsed = JSON.parse(messageContent)
 			return { description: parsed?.description ?? parsed }
+		} catch (error) {
+			return {
+				error: (error as Error).message ?? ' An unknown error occurred.',
+			}
+		}
+	}
+
+	/**
+	 * @description Detect patterns in a sequence of numbers using the Groq model.
+	 * @param sequence - Required - array of numbers or strings representing the sequence
+	 * @returns Promise resolving to PatternDetectionResponse containing the detected pattern or an error message.
+	 */
+	public async patternDetection(
+		sequence: number[] | string[],
+	): Promise<PatternDetectionResponse> {
+		try {
+			const response = await this.client.chat.completions.create({
+				model: this.model,
+				response_format: { type: 'json_object' },
+				messages: [
+					SystemPrompts.PATTERN_DETECTION,
+					{
+						role: 'user',
+						content: `SEQUENCE: [${sequence.join(', ')}]`,
+					},
+				],
+			})
+
+			const messageContent = response.choices?.[0]?.message?.content
+			if (!messageContent) {
+				return { error: 'No response from AI. Maybe some error occurred.' }
+			}
+
+			const parsed = JSON.parse(messageContent)
+			return { pattern: parsed?.pattern ?? parsed }
 		} catch (error) {
 			return {
 				error: (error as Error).message ?? ' An unknown error occurred.',

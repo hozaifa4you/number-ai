@@ -5,6 +5,7 @@ export type {
 	DescribeNumberResponse,
 	IsPrimeResponse,
 	LLMOptions,
+	PatternDetectionResponse,
 	RandomFloatArrayResponse,
 	RandomFloatResponse,
 	RandomIntArrayResponse,

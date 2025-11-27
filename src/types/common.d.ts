@@ -26,3 +26,8 @@ export interface DescribeNumberResponse {
 	description?: string
 	error?: string
 }
+
+export interface PatternDetectionResponse {
+	pattern?: string
+	error?: string
+}
