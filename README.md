@@ -175,7 +175,7 @@ const result = await ai.randomIntArray(10, 1, 10)
 if (result.error) {
 	console.error('Error:', result.error)
 } else {
-	console.log('Number:', result.num)
+	console.log('Number:', result.nums)
 }
 ```
 
@@ -215,7 +215,7 @@ const result = await ai.randomFloatArray(10, 1, 10)
 if (result.error) {
 	console.error('Error:', result.error)
 } else {
-	console.log('Number:', result.num)
+	console.log('Number:', result.nums)
 }
 ```
 
@@ -245,7 +245,59 @@ const result = await ai.isPrime(10)
 if (result.error) {
 	console.error('Error:', result.error)
 } else {
-	console.log('Number:', result.num)
+	console.log('Number:', result.is_prime)
+}
+```
+
+### `describeNumber(n!)`
+
+User gives a number → get a human-readable description
+
+**Parameters:**
+
+- `n` (required) - Which number want to describe
+
+**Returns:** `Promise<{ description?: string, error?: string }>`
+
+**Examples:**
+
+```typescript
+// Is prime
+await ai.describeNumber(19)
+// { description: "<details about 19>" }
+
+// Error handling
+const result = await ai.describeNumber(19)
+if (result.error) {
+	console.error('Error:', result.error)
+} else {
+	console.log('Number:', result.description)
+}
+```
+
+### `patternDetection(pattern!)`
+
+User gives a number → get a human-readable description
+
+**Parameters:**
+
+- `pattern: number[] | string[]` - (required) - Pattern you want to detect
+
+**Returns:** `Promise<{ pattern?: string, error?: string }>`
+
+**Examples:**
+
+```typescript
+// Is prime
+await ai.patternDetection([1, 3, 4, 5, 7])
+// { pattern: "<details about the given pattern>" }
+
+// Error handling
+const result = await ai.patternDetection([2, 4, 6])
+if (result.error) {
+	console.error('Error:', result.error)
+} else {
+	console.log('Number:', result.pattern)
 }
 ```
 

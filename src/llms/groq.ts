@@ -2,9 +2,12 @@ import dotenv from 'dotenv'
 import Groq from 'groq-sdk'
 import type { ChatCompletionCreateParamsBase } from 'groq-sdk/resources/chat/completions.mjs'
 import { SystemPrompts } from '../common/system'
+import { formatErrors, PatternDetectionSchema } from '../common/validation'
 import type {
+	DescribeNumberResponse,
 	IsPrimeResponse,
 	LLMOptions,
+	PatternDetectionResponse,
 	RandomFloatArrayResponse,
 	RandomFloatResponse,
 	RandomIntArrayResponse,
@@ -245,6 +248,83 @@ class NumberAiWithGroq {
 
 			const parsed = JSON.parse(messageContent)
 			return { is_prime: parsed?.is_prime ?? parsed }
+		} catch (error) {
+			return {
+				error: (error as Error).message ?? ' An unknown error occurred.',
+			}
+		}
+	}
+
+	/**
+	 * @description Get a description or interesting fact about a number using the Groq model.
+	 * @param n Required - number to describe
+	 * @returns Promise resolving to DescribeNumberResponse containing the description or an error message.
+	 */
+	public async describeNumber(n: number): Promise<DescribeNumberResponse> {
+		if (!n) {
+			return { error: 'Number parameter is required.' }
+		}
+
+		try {
+			const response = await this.client.chat.completions.create({
+				model: this.model,
+				response_format: { type: 'json_object' },
+				messages: [
+					SystemPrompts.DESCRIBE_NUMBER,
+					{ role: 'user', content: `NUMBER: ${n}` },
+				],
+			})
+			const messageContent = response.choices?.[0]?.message?.content
+			if (!messageContent) {
+				return { error: 'No response from AI. Maybe some error occurred.' }
+			}
+
+			const parsed = JSON.parse(messageContent)
+			return { description: parsed?.description ?? parsed }
+		} catch (error) {
+			return {
+				error: (error as Error).message ?? ' An unknown error occurred.',
+			}
+		}
+	}
+
+	/**
+	 * @description Detect patterns in a sequence of numbers using the Groq model.
+	 * @param sequence - Required - array of numbers or strings representing the sequence
+	 * @returns Promise resolving to PatternDetectionResponse containing the detected pattern or an error message.
+	 */
+	public async patternDetection(
+		sequence: number[] | string[],
+	): Promise<PatternDetectionResponse> {
+		const validation = PatternDetectionSchema.safeParse(sequence)
+		if (!validation.success) {
+			const errors = formatErrors(validation.error)
+
+			return {
+				error: errors.join(', ') || 'Invalid sequence input.',
+			}
+		}
+
+		try {
+			const response = await this.client.chat.completions.create({
+				model: this.model,
+				response_format: { type: 'json_object' },
+				messages: [
+					SystemPrompts.PATTERN_DETECTION,
+					{
+						role: 'user',
+						content: `SEQUENCE: [${sequence.join(', ')}]`,
+					},
+				],
+			})
+
+			const messageContent = response.choices?.[0]?.message?.content
+			if (!messageContent) {
+				return { error: 'No response from AI. Maybe some error occurred.' }
+			}
+
+			const parsed = JSON.parse(messageContent)
+			return { pattern: parsed?.pattern ?? parsed }
 		} catch (error) {
 			return {
 				error: (error as Error).message ?? ' An unknown error occurred.',

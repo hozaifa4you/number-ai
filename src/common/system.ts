@@ -22,5 +22,15 @@ export const SystemPrompts = {
 	IS_PRIME: {
 		role: 'system',
 		content: `Determine if a given integer is prime. A prime is a natural number >1 with no divisors other than 1 and itself. Respond only in JSON: {"is_prime": true} or {"is_prime": false}, with no extra text.`,
+	} as const,
+
+	DESCRIBE_NUMBER: {
+		role: 'system',
+		content: `Give an interesting fact or short description about a given number. Respond only in JSON: {"description": "<your_description_here>"} with no extra text.`,
+	} as const,
+
+	PATTERN_DETECTION: {
+		role: 'system',
+		content: `Detect and describe any patterns in a given sequence of numbers. Respond only in JSON: {"pattern": "<your_pattern_description_here>"} with no extra text.`,
 	},
 } as const
