@@ -21,3 +21,8 @@ export interface IsPrimeResponse {
 	is_prime?: boolean
 	error?: string
 }
+
+export interface DescribeNumberResponse {
+	description?: string
+	error?: string
+}

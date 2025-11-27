@@ -3,6 +3,7 @@ import Groq from 'groq-sdk'
 import type { ChatCompletionCreateParamsBase } from 'groq-sdk/resources/chat/completions.mjs'
 import { SystemPrompts } from '../common/system'
 import type {
+	DescribeNumberResponse,
 	IsPrimeResponse,
 	LLMOptions,
 	RandomFloatArrayResponse,
@@ -245,6 +246,39 @@ class NumberAiWithGroq {
 
 			const parsed = JSON.parse(messageContent)
 			return { is_prime: parsed?.is_prime ?? parsed }
+		} catch (error) {
+			return {
+				error: (error as Error).message ?? ' An unknown error occurred.',
+			}
+		}
+	}
+
+	/**
+	 * @description Get a description or interesting fact about a number using the Groq model.
+	 * @param n Required - number to describe
+	 * @returns Promise resolving to DescribeNumberResponse containing the description or an error message.
+	 */
+	public async describeNumber(n: number): Promise<DescribeNumberResponse> {
+		if (!n) {
+			return { error: 'Number parameter is required.' }
+		}
+
+		try {
+			const response = await this.client.chat.completions.create({
+				model: this.model,
+				response_format: { type: 'json_object' },
+				messages: [
+					SystemPrompts.DESCRIBE_NUMBER,
+					{ role: 'user', content: `NUMBER: ${n}` },
+				],
+			})
+			const messageContent = response.choices?.[0]?.message?.content
+			if (!messageContent) {
+				return { error: 'No response from AI. Maybe some error occurred.' }
+			}
+
+			const parsed = JSON.parse(messageContent)
+			return { description: parsed?.description ?? parsed }
 		} catch (error) {
 			return {
 				error: (error as Error).message ?? ' An unknown error occurred.',
