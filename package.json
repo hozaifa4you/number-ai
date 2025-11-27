@@ -3,6 +3,7 @@
 	"version": "0.2.1",
 	"description": "AI-powered number operations using OpenAI, Groq, and other LLM providers. Generate random numbers, discover patterns, and perform intelligent math operations.",
 	"keywords": [
+		"number-ai",
 		"ai",
 		"openai",
 		"groq",
@@ -13,7 +14,9 @@
 		"isPrime",
 		"randomInteger",
 		"randomFloat",
-		"randomArray"
+		"randomArray",
+		"pattern detection",
+		"describe number"
 	],
 	"homepage": "https://github.com/hozaifa4you/number-ai#readme",
 	"bugs": {
@@ -76,6 +79,7 @@
 	"dependencies": {
 		"dotenv": "^17.2.3",
 		"groq-sdk": "^0.36.0",
-		"openai": "^6.9.1"
+		"openai": "^6.9.1",
+		"zod": "^4.1.13"
 	}
 }

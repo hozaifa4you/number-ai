@@ -2,6 +2,7 @@ import dotenv from 'dotenv'
 import OpenAI from 'openai'
 import type { ChatCompletionCreateParamsBase } from 'openai/resources/chat/completions.mjs'
 import { SystemPrompts } from '../common/system'
+import { formatErrors, PatternDetectionSchema } from '../common/validation'
 import type {
 	DescribeNumberResponse,
 	IsPrimeResponse,
@@ -293,6 +294,15 @@ class NumberAiWithOpenAi {
 	public async patternDetection(
 		sequence: number[] | string[],
 	): Promise<PatternDetectionResponse> {
+		const validation = PatternDetectionSchema.safeParse(sequence)
+		if (!validation.success) {
+			const errors = formatErrors(validation.error)
+
+			return {
+				error: errors.join(', ') || 'Invalid sequence input.',
+			}
+		}
+
 		try {
 			const response = await this.client.chat.completions.create({
 				model: this.model,

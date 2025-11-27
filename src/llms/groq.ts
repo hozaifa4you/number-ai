@@ -2,6 +2,7 @@ import dotenv from 'dotenv'
 import Groq from 'groq-sdk'
 import type { ChatCompletionCreateParamsBase } from 'groq-sdk/resources/chat/completions.mjs'
 import { SystemPrompts } from '../common/system'
+import { formatErrors, PatternDetectionSchema } from '../common/validation'
 import type {
 	DescribeNumberResponse,
 	IsPrimeResponse,
@@ -295,6 +296,15 @@ class NumberAiWithGroq {
 	public async patternDetection(
 		sequence: number[] | string[],
 	): Promise<PatternDetectionResponse> {
+		const validation = PatternDetectionSchema.safeParse(sequence)
+		if (!validation.success) {
+			const errors = formatErrors(validation.error)
+
+			return {
+				error: errors.join(', ') || 'Invalid sequence input.',
+			}
+		}
+
 		try {
 			const response = await this.client.chat.completions.create({
 				model: this.model,
