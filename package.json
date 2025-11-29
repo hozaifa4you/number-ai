@@ -5,18 +5,18 @@
 	"keywords": [
 		"number-ai",
 		"ai",
-		"openai",
-		"groq",
-		"llm",
 		"numbers",
-		"random",
-		"math",
 		"isPrime",
 		"randomInteger",
 		"randomFloat",
 		"randomArray",
 		"pattern detection",
-		"describe number"
+		"describe number",
+		"pattern generation",
+		"unit conversion",
+		"openai",
+		"groq",
+		"llm"
 	],
 	"homepage": "https://github.com/hozaifa4you/number-ai#readme",
 	"bugs": {
