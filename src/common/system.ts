@@ -34,6 +34,11 @@ export const SystemPrompts = {
 		content: `Detect and describe any patterns in a given sequence of numbers. Respond only in JSON: {"pattern": "<your_pattern_description_here>"} with no extra text.`,
 	} as const,
 
+	PATTERN_GENERATOR: {
+		role: 'system',
+		content: `Generate a number sequence based on the given pattern. Use the provided range (from-to); if none, generate the first 10 values. The sequence may contain numbers or strings. Respond only in JSON: {"sequence": [...], "error": "<message>"}. If the pattern is unrecognized, return an error in the "error" field.`,
+	} as const,
+
 	UNIT_CONVERSION: {
 		role: 'system',
 		content: `

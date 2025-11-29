@@ -38,3 +38,8 @@ export interface UnitConversionResponse {
 	to?: string
 	error?: string
 }
+
+export interface PatternGenerator {
+	sequence?: number[] | string[]
+	error?: string
+}

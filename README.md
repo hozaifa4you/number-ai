@@ -303,7 +303,7 @@ if (result.error) {
 
 ### `unitConversion(value!, from!, to!)`
 
-User gives a number → get a human-readable description
+Convert unit from an unit to other unit if possible.
 
 **Parameters:**
 
@@ -330,6 +330,34 @@ if (result.error) {
 	console.error('Error:', result.error)
 } else {
 	console.log('Number:', result.value, 'From:', result.from, 'To:', result.to)
+}
+```
+
+### `patternGenerator(pattern!, from?, to?)`
+
+Generate a number/string pattern based on user input.
+
+**Parameters:**
+
+- `pattern`: `string` - (Required) The pattern to generate.
+- `from`: `number` - (Optional) The start of the range.
+- `to`: `number` - (Optional) The end of the range.
+
+**Returns:** `Promise<{ sequence?: (number | string)[], error?: string }>`
+
+**Examples:**
+
+```typescript
+// Fibonacci sequence from 1 to 10
+await ai.patternGenerator('fibonacci', 1, 10)
+// { sequence: [1, 1, 2, 3, 5, 8]}
+
+// Error handling
+const result = await ai.patternGenerator('fibonacci', 1, 10)
+if (result.error) {
+	console.error('Error:', result.error)
+} else {
+	console.log('Number:', result.sequence)
 }
 ```
 

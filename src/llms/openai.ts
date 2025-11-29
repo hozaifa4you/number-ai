@@ -8,6 +8,7 @@ import type {
 	IsPrimeResponse,
 	LLMOptions,
 	PatternDetectionResponse,
+	PatternGenerator,
 	RandomFloatArrayResponse,
 	RandomFloatResponse,
 	RandomIntArrayResponse,
@@ -366,6 +367,52 @@ class NumberAiWithOpenAi {
 				value: parsed?.value,
 				from: parsed?.from,
 				to: parsed?.to,
+			}
+		} catch (error) {
+			return {
+				error: (error as Error).message ?? ' An unknown error occurred.',
+			}
+		}
+	}
+
+	/**
+	 * @param pattern - (Required) The pattern you want to generate.
+	 * @param from - (Optional) The starting index or value for the pattern generation.
+	 * @param to - (Optional) The ending index or value for the pattern generation.
+	 * @returns Promise resolving to PatternGenerator containing the generated sequence or an error message. Only first `10 values` will be generated if `from` and `to` are not provided.
+	 * @example - "Fibonacci sequence", "Even numbers", "Prime numbers", etc.
+	 */
+	public async patternGenerator(
+		pattern: string,
+		from?: number,
+		to?: number,
+	): Promise<PatternGenerator> {
+		try {
+			const response = await this.client.chat.completions.create({
+				model: this.model,
+				response_format: { type: 'json_object' },
+				messages: [
+					SystemPrompts.PATTERN_GENERATOR,
+					{
+						role: 'user',
+						content: `
+								PATTERN: ${pattern}, FROM: ${from}, TO: ${to}.
+								\n--------\n
+								CAUTION: Do not try to answer outside of the context of the pattern generation task.
+							`,
+					},
+				],
+			})
+
+			const messageContent = response.choices?.[0]?.message?.content
+			if (!messageContent) {
+				return { error: 'No response from AI. Maybe some error occurred.' }
+			}
+
+			const parsed = JSON.parse(messageContent)
+			return {
+				sequence: parsed?.sequence,
+				error: parsed?.error,
 			}
 		} catch (error) {
 			return {
