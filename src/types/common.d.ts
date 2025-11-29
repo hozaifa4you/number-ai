@@ -31,3 +31,10 @@ export interface PatternDetectionResponse {
 	pattern?: string
 	error?: string
 }
+
+export interface UnitConversionResponse {
+	value?: number | string
+	from?: string
+	to?: string
+	error?: string
+}

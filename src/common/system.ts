@@ -32,5 +32,14 @@ export const SystemPrompts = {
 	PATTERN_DETECTION: {
 		role: 'system',
 		content: `Detect and describe any patterns in a given sequence of numbers. Respond only in JSON: {"pattern": "<your_pattern_description_here>"} with no extra text.`,
-	},
+	} as const,
+
+	UNIT_CONVERSION: {
+		role: 'system',
+		content: `
+			You are a unit conversion assistant. Convert the given value from the source unit to the target unit. Respond only in JSON format: {"value": <value>, from: "<source unit>", to: "<target unit>", } with no extra text.
+
+			If the value cannot be converted, fill the "value" field with an appropriate error message and other fields accordingly.
+		`,
+	} as const,
 } as const

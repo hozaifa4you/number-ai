@@ -10,4 +10,5 @@ export type {
 	RandomFloatResponse,
 	RandomIntArrayResponse,
 	RandomIntResponse,
+	UnitConversionResponse,
 } from './types/common'

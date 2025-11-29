@@ -301,6 +301,38 @@ if (result.error) {
 }
 ```
 
+### `unitConversion(value!, from!, to!)`
+
+User gives a number → get a human-readable description
+
+**Parameters:**
+
+- `value`: `number | string` - (Required) The numeric value to convert.
+- `from`: `string` - (Required) The unit to convert from.
+- `to`: `string` - (Required) The unit to convert to.
+
+**Returns:** `Promise<{ value?: string, from?: string, to?:string, error?: string }>`
+
+**Examples:**
+
+```typescript
+// Possible unit conversion
+await ai.unitConversion(100, 'cm', 'meter')
+// { value: 1, from: "cm", to: "meter" }
+
+// Impossible unit conversion
+await ai.unitConversion(100, 'kg', 'meter')
+// { value: "<AI error message>", from: "kg", to: "meter" }
+
+// Error handling
+const result = await ai.unitConversion(10, 'cm', 'inch')
+if (result.error) {
+	console.error('Error:', result.error)
+} else {
+	console.log('Number:', result.value, 'From:', result.from, 'To:', result.to)
+}
+```
+
 ## TypeScript
 
 Full TypeScript support included:

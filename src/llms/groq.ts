@@ -12,6 +12,7 @@ import type {
 	RandomFloatResponse,
 	RandomIntArrayResponse,
 	RandomIntResponse,
+	UnitConversionResponse,
 } from '../types/common'
 
 dotenv.config()
@@ -325,6 +326,49 @@ class NumberAiWithGroq {
 
 			const parsed = JSON.parse(messageContent)
 			return { pattern: parsed?.pattern ?? parsed }
+		} catch (error) {
+			return {
+				error: (error as Error).message ?? ' An unknown error occurred.',
+			}
+		}
+	}
+
+	/**
+	 * @description Convert a value from one unit to another using the Groq model.
+	 * @param value - (Required) The numeric value to convert.
+	 * @param from - (Required) The unit to convert from.
+	 * @param to - (Required) The unit to convert to.
+	 * @returns Promise resolving to UnitConversionResponse containing the converted value or an error message.
+	 */
+	public async unitConversion(
+		value: string | number,
+		from: string,
+		to: string,
+	): Promise<UnitConversionResponse> {
+		try {
+			const response = await this.client.chat.completions.create({
+				model: this.model,
+				response_format: { type: 'json_object' },
+				messages: [
+					SystemPrompts.UNIT_CONVERSION,
+					{
+						role: 'user',
+						content: `VALUE: ${value}, FROM: ${from}, TO: ${to}`,
+					},
+				],
+			})
+
+			const messageContent = response.choices?.[0]?.message?.content
+			if (!messageContent) {
+				return { error: 'No response from AI. Maybe some error occurred.' }
+			}
+
+			const parsed = JSON.parse(messageContent)
+			return {
+				value: parsed?.value,
+				from: parsed?.from,
+				to: parsed?.to,
+			}
 		} catch (error) {
 			return {
 				error: (error as Error).message ?? ' An unknown error occurred.',
