@@ -1,5 +1,5 @@
 import { describe, expect, it, mock } from 'bun:test'
-import { NumberAiWithOpenAi } from '../src/llms/openai'
+import { NumberAiWithOpenAi } from '../../src/llms/openai'
 
 // Minimal typed shape for the internal client used in tests.
 type InternalClientForTest = {

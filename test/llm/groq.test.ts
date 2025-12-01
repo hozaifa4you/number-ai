@@ -1,5 +1,5 @@
 import { describe, expect, it, mock } from 'bun:test'
-import { NumberAiWithGroq } from '../src/llms/groq'
+import { NumberAiWithGroq } from '../../src/llms/groq'
 
 // Minimal typed shape for the internal client used in tests.
 type InternalClientForTest = {

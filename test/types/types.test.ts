@@ -11,7 +11,7 @@ import type {
 	RandomIntArrayResponse,
 	RandomIntResponse,
 	UnitConversionResponse,
-} from '../src/types/common'
+} from '../../src/types/common'
 
 describe('RandomIntResponse type', () => {
 	it('should accept valid success response', () => {
