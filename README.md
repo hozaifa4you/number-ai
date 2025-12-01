@@ -361,22 +361,68 @@ if (result.error) {
 }
 ```
 
+### `arithmeticOperation(operand1!, operator!, operand2?)`
+
+Perform arithmetic operations using AI.
+
+**Parameters:**
+
+- `operand1`: `number | string` - (Required) The first operand.
+- `operator`: `ArithmeticOperator` - (Required) The arithmetic operator. Supported operators: `'+'`, `'-'`, `'*'`, `'/'`, `'%'`, `'^'`, `'log'`, `'sqrt'`, `'abs'`, `'sin'`, `'cos'`, `'tan'`, `'mod'`, `'floor'`, `'ceil'`, `'round'`, `'min'`, `'max'`.
+- `operand2`: `number | string` - (Optional) The second operand. Required for binary operators (`+`, `-`, `*`, `/`, `%`, `^`, `mod`, `min`, `max`). Not required for unary operators (`sqrt`, `abs`, `sin`, `cos`, `tan`, `floor`, `ceil`, `round`, `log`).
+
+**Returns:** `Promise<{ result?: number, error?: string }>`
+
+**Examples:**
+
+```typescript
+// Addition
+await ai.arithmeticOperation(10, '+', 5)
+// { result: 15 }
+
+// Square root (unary operator)
+await ai.arithmeticOperation(16, 'sqrt')
+// { result: 4 }
+
+// Power
+await ai.arithmeticOperation(2, '^', 3)
+// { result: 8 }
+
+// Trigonometric function
+await ai.arithmeticOperation(90, 'sin')
+// { result: 1 }
+
+// Error handling
+const result = await ai.arithmeticOperation(10, '+', 5)
+if (result.error) {
+	console.error('Error:', result.error)
+} else {
+	console.log('Result:', result.result)
+}
+```
+
 ## TypeScript
 
 Full TypeScript support included:
 
 ```typescript
 import type {
-	RandomIntResponse,
+	ArithmeticOperationResponse,
+	ArithmeticOperator,
+	DescribeNumberResponse,
 	IsPrimeResponse,
 	LLMOptions,
+	PatternDetectionResponse,
+	PatternGenerator,
 	RandomFloatArrayResponse,
 	RandomFloatResponse,
 	RandomIntArrayResponse,
 	RandomIntResponse,
+	UnitConversionResponse,
 } from 'number-ai'
 
 const result: RandomIntResponse = await ai.randomInt(1, 100)
+const operation: ArithmeticOperationResponse = await ai.arithmeticOperation(10, '+', 5)
 ```
 
 ## License
