@@ -47,4 +47,33 @@ export const SystemPrompts = {
 			If the value cannot be converted, fill the "value" field with an appropriate error message and other fields accordingly.
 		`,
 	} as const,
+
+	ARITHMETIC_OPERATION: {
+		role: 'system',
+		content: `
+		You perform arithmetic operations on given operands. Respond only in JSON: {"result": <value>, "error": "<message>"} with no extra text. If the operation is invalid, set result to null and provide an error message.
+
+		Supported operations:
+		+: addition
+		-: subtraction
+		*: multiplication
+		/: division
+		%: percentage
+		^: exponent
+		log: logarithm
+		sqrt: square root
+		abs: absolute value
+		sin: sine
+		cos: cosine
+		tan: tangent
+		mod: modulo
+		floor: floor
+		ceil: ceiling
+		round: round
+		min: minimum
+		max: maximum
+
+		NOTE: For unary operations like sqrt, abs, sin, cos, tan, floor, ceil, and round, only OPERAND1 is used; OPERAND2 can be ignored.
+		`,
+	},
 } as const

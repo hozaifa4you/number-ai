@@ -1,9 +1,11 @@
 import dotenv from 'dotenv'
 import Groq from 'groq-sdk'
 import type { ChatCompletionCreateParamsBase } from 'groq-sdk/resources/chat/completions.mjs'
+import type { ArithmeticOperator } from '../common/constant'
 import { SystemPrompts } from '../common/system'
 import { formatErrors, PatternDetectionSchema } from '../common/validation'
 import type {
+	ArithmeticOperationResponse,
 	DescribeNumberResponse,
 	IsPrimeResponse,
 	LLMOptions,
@@ -20,6 +22,24 @@ dotenv.config()
 
 const apiKey = process.env.GROQ_API_KEY
 
+/**
+ * NumberAiWithGroq - A class that provides AI-powered number operations using the Groq API.
+ *
+ * @class
+ * @description This class wraps the Groq API to provide various number-related operations including:
+ * - Random number generation (integers, floats, and arrays)
+ * - Number analysis (primality testing, descriptions)
+ * - Pattern detection and generation
+ * - Unit conversion
+ * - Arithmetic operations
+ *
+ * @example
+ * ```typescript
+ * const llm = new NumberAiWithGroq({ apiKey: 'your-api-key', model: 'openai/gpt-oss-20b' });
+ * const randomInt = await llm.randomInt(1, 100);
+ * const isPrime = await llm.isPrime(17);
+ * ```
+ */
 class NumberAiWithGroq {
 	private client: Groq
 	private model: ChatCompletionCreateParamsBase['model']
@@ -414,6 +434,55 @@ class NumberAiWithGroq {
 			const parsed = JSON.parse(messageContent)
 			return {
 				sequence: parsed?.sequence,
+				error: parsed?.error,
+			}
+		} catch (error) {
+			return {
+				error: (error as Error).message ?? ' An unknown error occurred.',
+			}
+		}
+	}
+
+	/**
+	 * Performs an arithmetic operation using AI by sending operands and operator to the LLM.
+	 * @param operand1 - The first operand (number or string representation)
+	 * @param operator - The arithmetic operator to apply. Supported operators: '+', '-', '*', '/', '%', '^', 'log', 'sqrt', 'abs', 'sin', 'cos', 'tan', 'mod', 'floor', 'ceil', 'round', 'min', 'max'
+	 * @param operand2 - The second operand (optional, number or string representation). Required for binary operators like '+', '-', '*', '/', '%', '^', 'mod', 'min', 'max'. Not required for unary operators like 'sqrt', 'abs', 'sin', 'cos', 'tan', 'floor', 'ceil', 'round', 'log'.
+	 * @returns A promise resolving to the operation result or error message
+	 */
+	public async arithmeticOperation(
+		operand1: number | string,
+		operator: ArithmeticOperator,
+		operand2?: number | string,
+	): Promise<ArithmeticOperationResponse> {
+		try {
+			const response = await this.client.chat.completions.create({
+				model: this.model,
+				response_format: { type: 'json_object' },
+				messages: [
+					SystemPrompts.ARITHMETIC_OPERATION,
+					{
+						role: 'user',
+						content: `
+						OPERAND1: ${operand1}\n
+						OPERATOR: ${operator}\n
+						OPERAND2: ${operand2 ?? 'not provided'}.\n
+
+						Please perform the arithmetic operation based on the given inputs.`,
+					},
+				],
+			})
+
+			const messageContent = response.choices?.[0]?.message?.content
+			if (!messageContent) {
+				return {
+					error: 'No response from AI. Maybe some error occurred.',
+				}
+			}
+
+			const parsed = JSON.parse(messageContent)
+			return {
+				result: parsed?.result,
 				error: parsed?.error,
 			}
 		} catch (error) {

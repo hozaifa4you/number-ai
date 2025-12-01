@@ -3,7 +3,7 @@
 This file gives focused, repository-specific guidance to AI coding assistants so they can be productive without human hand-holding.
 
 - Repo root: TypeScript + Bun. Primary sources live in `src/`.
-- Entry point: `src/index.ts` exports provider-specific classes from `src/openai.ts`, `src/groq.ts`, etc.
+- Entry point: `src/index.ts` exports provider-specific classes from `src/llms/openai.ts`, `src/llms/groq.ts`, etc.
 
 Key facts (quick skim)
 
@@ -11,61 +11,125 @@ Key facts (quick skim)
    - `bun run build` -> `bunup` (build/distribution step)
    - `bun run dev` -> `bunup --watch` (dev watch)
    - `bun run test` -> runs tests with Bun (`bun test`)
+   - `bun run test:coverage` -> runs tests with coverage report
+   - `bun run test:watch` -> runs tests in watch mode
    - `bun run lint` -> `biome check .` (biome linter)
+   - `bun run lint:fix` -> `biome check --write .` (autofix linter issues)
+   - `bun run format` -> `prettier . --check` (check formatting)
+   - `bun run format:fix` -> `prettier . --write` (autofix formatting)
    - `bun run type-check` -> `tsc --noEmit`
+   - `bun run release` -> `bumpp --commit --push --tag` (version bump and release)
 - Environment variables loaded with `dotenv`. Current providers expect `OPENAI_API_KEY` and `GROQ_API_KEY`.
+- Current version: `0.2.4` (published on npm)
 
 Architecture and why
 
-- **npm package for AI-powered number operations**: This library provides AI-based methods for working with numbers (pattern discovery, predictions, math operations, random generation, etc.).
-- **Multi-LLM support**: Architecture supports multiple AI providers (OpenAI, Groq, and future providers). Each provider has its own wrapper class that extends the official SDK.
-   - `NumberAiWithOpenAi` in `src/openai.ts` — extends OpenAI SDK
-   - `NumberAiWithGroq` in `src/groq.ts` — extends Groq SDK
-   - Future providers follow the same pattern
-- **Shared types**: Common types like `RandomIntResponse` live in `src/types/common.d.ts` to ensure consistent return shapes across providers.
-- **Provider-agnostic method signatures**: Each provider class implements the same methods (e.g., `randomInt`) with identical signatures and return types for consistent API.
+- **npm package for AI-powered number operations**: This library provides AI-based methods for working with numbers (pattern discovery, predictions, math operations, random generation, unit conversion, etc.).
+- **Multi-LLM support**: Architecture supports multiple AI providers (OpenAI, Groq, and future providers). Each provider has its own wrapper class using **composition pattern** (not inheritance).
+   - `NumberAiWithOpenAi` in `src/llms/openai.ts` — wraps OpenAI SDK with private `client` property
+   - `NumberAiWithGroq` in `src/llms/groq.ts` — wraps Groq SDK with private `client` property
+   - Future providers follow the same composition pattern
+- **Shared types**: Common types like `RandomIntResponse`, `IsPrimeResponse`, etc. live in `src/types/common.d.ts` to ensure consistent return shapes across providers.
+- **Provider-agnostic method signatures**: Each provider class implements the same methods with identical signatures and return types for consistent API.
+- **Shared system prompts**: All AI prompts centralized in `src/common/system.ts` (SystemPrompts object) for consistency and maintainability.
+- **Validation utilities**: Zod schemas and formatters in `src/common/validation.ts` for input/output validation.
+- **Constructor pattern**: All providers use `LLMOptions` interface for initialization:
+   ```typescript
+   constructor(options: LLMOptions) {
+     const key = options.apiKey ?? apiKey
+     if (!key) {
+       throw new Error('API key is required...')
+     }
+     this.client = new Provider({ apiKey: key })
+     this.model = options.model ?? 'default-model'
+   }
+   ```
 
 Important patterns and conventions (do not break)
 
 - **Runtime & packaging**: repository targets Bun and outputs to a `dist` folder. The project uses ES modules (`type: "module"`). Keep imports/exports ESM-compatible.
+- **Composition over inheritance**: Provider classes **wrap** the SDK client internally (private `client` property) instead of extending it. This prevents exposing all SDK methods on the public instance. Each provider exposes a controlled `_internalClient` getter for testing/debugging only.
+- **API key validation**: Constructors **must** validate that an API key is available (from parameter or environment). If not, throw an error with a clear message.
 - **Tests and CI**: tests use `bun test`. When adding tests, prefer TypeScript test files in `test/` and run via `bun`.
    - Each provider has its own test file (e.g., `test/openai.test.ts`, `test/groq.test.ts`)
-   - Mock AI SDK calls using `@ts-expect-error` comments to bypass type checking
+   - Mock AI SDK calls using typed `InternalClientForTest` helper to avoid `@ts-expect-error` and `any`
+   - Example mock pattern:
+      ```typescript
+      type InternalClientForTest = {
+        chat: {
+          completions: {
+            create: (...args: unknown[]) => Promise<unknown>
+          }
+        }
+      }
+      const internal = (client as unknown as { _internalClient: InternalClientForTest })._internalClient
+      internal.chat.completions.create = mock(() => Promise.resolve({...}))
+      ```
    - Never rely on real API keys in tests
-- **Lint & pre-commit**: `simple-git-hooks` runs `bun run lint && bun run type-check` on pre-commit. Avoid changes that cause type or linter failures.
+- **Lint & pre-commit**: `simple-git-hooks` runs `bun run lint && bun run type-check` on pre-commit. Avoid changes that cause type or linter failures. Use `bun run lint:fix` to autofix.
 - **Environment handling**: Provider files call `dotenv.config()`. Avoid logging secrets in production code.
+- **Error responses**: Methods return discriminated unions (e.g., `{ num?: number, error?: string }`). Never throw errors from public methods—return error objects instead.
+- **Response parsing**: Use `JSON.parse` with try/catch. Check for `messageContent` presence before parsing. Return appropriate error object if parsing fails.
+- **System prompts**: All AI prompts live in `src/common/system.ts` as `SystemPrompts` constant. When adding methods, add corresponding prompt there.
 - **Adding new LLM providers**:
-   1. Create `src/<provider>.ts` with a class extending the provider's SDK
-   2. Implement all existing methods (e.g., `randomInt`) with matching signatures
-   3. Use shared types from `src/types/common.d.ts`
-   4. Export from `src/index.ts`
-   5. Add corresponding test file in `test/<provider>.test.ts`
-   6. Update this file to document the new provider
+   1. Create `src/llms/<provider>.ts` with a class using composition (private `client` property)
+   2. Implement constructor accepting `LLMOptions` with API key validation
+   3. Implement all existing methods with matching signatures
+   4. Use shared types from `src/types/common.d.ts`
+   5. Use shared prompts from `src/common/system.ts`
+   6. Export from `src/index.ts`
+   7. Add corresponding test file in `test/<provider>.test.ts`
+   8. Update this file to document the new provider
 - **Adding new number methods**:
-   1. Add method to all provider classes with identical signatures
-   2. Define shared return types in `src/types/common.d.ts`
-   3. Add tests for each provider
-   4. Ensure method works consistently across all providers
+   1. Design the method signature and return type first (add to `src/types/common.d.ts`)
+   2. Add system prompt to `src/common/system.ts`
+   3. Implement in all existing providers with consistent prompts and parsing
+   4. Add tests for each provider
+   5. Ensure method works consistently across all providers
+   6. Export new types from `src/index.ts`
 
 Examples & file references
 
 - **Provider implementations**:
-   - `src/openai.ts` — `NumberAiWithOpenAi` extends OpenAI SDK, uses `gpt-4o-mini` by default
-   - `src/groq.ts` — `NumberAiWithGroq` extends Groq SDK, uses `openai/gpt-oss-20b` by default
-   - Both accept custom models via constructor: `new NumberAiWithOpenAi('api-key', 'gpt-4')`
+   - `src/llms/openai.ts` — `NumberAiWithOpenAi` wraps OpenAI SDK, uses `gpt-4o-mini` by default
+   - `src/llms/groq.ts` — `NumberAiWithGroq` wraps Groq SDK, uses `openai/gpt-oss-20b` by default
+   - Both accept custom models via constructor: `new NumberAiWithOpenAi({ apiKey: 'key', model: 'gpt-4' })`
+
+- **Available methods** (all providers implement these consistently):
+   - `randomInt(min?, max?)` — Generate random integer
+   - `randomFloat(min?, max?)` — Generate random float
+   - `randomIntArray(count, min?, max?)` — Generate array of random integers
+   - `randomFloatArray(count, min?, max?)` — Generate array of random floats
+   - `isPrime(n)` — Check if number is prime
+   - `describeNumber(n)` — Get interesting fact about a number
+   - `patternDetection(sequence)` — Detect patterns in number sequence
+   - `unitConversion(value, from, to)` — Convert between units
+   - `patternGenerator(pattern, from?, to?)` — Generate number sequence from pattern
 
 - **Method pattern** (example: `randomInt`):
-   - Constructs system + user messages with clear instructions for JSON output format
+   - Constructs system + user messages using `SystemPrompts.RANDOM_INT`
    - Expects AI response: `{"random_integer": <value>}`
    - Parses response and returns `RandomIntResponse` type
    - Handles errors gracefully (missing response, invalid JSON)
-   - When adding methods, follow this pattern: clear prompt → JSON response → typed return
+   - When adding methods, follow this pattern: use SystemPrompt → JSON response → typed return → error handling
 
 - **Shared types**: `src/types/common.d.ts`
-   - `RandomIntResponse` — discriminated union for success/error states
+   - `LLMOptions` — constructor options (`{ apiKey?: string, model?: string }`)
+   - `RandomIntResponse`, `RandomFloatResponse` — `{ num?: number, error?: string }`
+   - `RandomIntArrayResponse`, `RandomFloatArrayResponse` — `{ nums?: number[], error?: string }`
+   - `IsPrimeResponse` — `{ is_prime?: boolean, error?: string }`
+   - `DescribeNumberResponse` — `{ description?: string, error?: string }`
+   - `PatternDetectionResponse` — `{ pattern?: string, error?: string }`
+   - `UnitConversionResponse` — `{ value?: number | string, from?: string, to?: string, error?: string }`
+   - `PatternGenerator` — `{ sequence?: number[] | string[], error?: string }`
    - Add new method return types here to ensure consistency across providers
 
-- **Public API**: `src/index.ts` exports all provider classes. When adding providers or changing API surface, update exports here.
+- **Shared utilities**:
+   - `src/common/system.ts` — `SystemPrompts` object with all AI prompts
+   - `src/common/validation.ts` — Zod schemas and `formatErrors` utility
+   - `src/common/constant.ts` — Arithmetic operators and constants
+
+- **Public API**: `src/index.ts` exports all provider classes and types. When adding providers or changing API surface, update exports here.
 
 Developer workflows (practical commands)
 
@@ -85,7 +149,23 @@ Testing & expectations
    2. Success case (valid AI response returns expected data)
    3. Missing response (empty choices array)
    4. Invalid JSON (malformed response)
-- **Mocking pattern**: Use `@ts-expect-error` to mock `client.chat.completions.create` without type conflicts
+- **Mocking pattern**: Use typed `InternalClientForTest` helper to avoid unsafe type directives
+   ```typescript
+   type InternalClientForTest = {
+   	chat: {
+   		completions: {
+   			create: (...args: unknown[]) => Promise<unknown>
+   		}
+   	}
+   }
+   const internal = (client as unknown as { _internalClient: InternalClientForTest })
+   	._internalClient
+   internal.chat.completions.create = mock(() =>
+   	Promise.resolve({
+   		choices: [{ message: { content: '{"random_integer": 42}' } }],
+   	}),
+   )
+   ```
 - When adding new providers or methods, replicate the test structure from existing provider tests.
 
 Security & secrets
@@ -103,9 +183,10 @@ When editing AI integrations
 - **Error handling**: Return discriminated unions (`{ num: number, error: null } | { num: null, error: string }`) instead of throwing errors.
 - **Adding new methods across providers**:
    1. Design the method signature and return type first (add to `src/types/common.d.ts`)
-   2. Implement in all existing providers with consistent prompts and parsing
-   3. Add tests for each provider
-   4. Update documentation
+   2. Add system prompt to `src/common/system.ts`
+   3. Implement in all existing providers with consistent prompts and parsing
+   4. Add tests for each provider
+   5. Update documentation
 
 What to look for in PR reviews (quick checklist)
 
@@ -130,9 +211,12 @@ If anything here is unclear or you want the agent to follow additional project-s
 
 Files referenced in these instructions:
 
-- `src/openai.ts` — OpenAI provider wrapper (randomInt implementation)
-- `src/groq.ts` — Groq provider wrapper (randomInt implementation)
+- `src/llms/openai.ts` — OpenAI provider wrapper (all methods implemented)
+- `src/llms/groq.ts` — Groq provider wrapper (all methods implemented)
 - `src/types/common.d.ts` — shared types for consistent return shapes
+- `src/common/system.ts` — centralized AI prompts (SystemPrompts)
+- `src/common/validation.ts` — Zod schemas and error formatting
+- `src/common/constant.ts` — Arithmetic operators constants
 - `src/index.ts` — public export surface for all providers
 - `package.json` — scripts, runtime, and build instructions
 - `test/openai.test.ts`, `test/groq.test.ts`, `test/types.test.ts` — provider-specific and type tests

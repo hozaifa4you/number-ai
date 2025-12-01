@@ -43,3 +43,8 @@ export interface PatternGenerator {
 	sequence?: number[] | string[]
 	error?: string
 }
+
+export interface ArithmeticOperationResponse {
+	result?: number
+	error?: string
+}
